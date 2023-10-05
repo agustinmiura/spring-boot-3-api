@@ -12,4 +12,5 @@ public class PhoneDto {
     private boolean isAvailable = true;
     private LocalDateTime bookingTime;
     private List<String> bookingUsers = new ArrayList<>();
+    private TechnicalInfoDto technicalInfoDto;
 }

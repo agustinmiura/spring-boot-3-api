@@ -25,6 +25,8 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic")
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
+	implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
 }
 
 tasks.withType<Test> {

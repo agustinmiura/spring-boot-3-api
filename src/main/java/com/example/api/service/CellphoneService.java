@@ -1,10 +1,12 @@
 package com.example.api.service;
 
+import com.example.api.client.PhoneApiClient;
 import com.example.api.dto.BookingDto;
 import com.example.api.dto.PhoneDto;
 import com.example.api.enums.CellphoneNameEnum;
 import com.example.api.repository.IBookingRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,10 +22,13 @@ public class CellphoneService {
 
     private IBookingRepository bookingRepository;
 
+    private PhoneApiClient phoneApiClient;
+
     private Map<String, Integer> initialQtyMap = new HashMap<>();
 
-    public CellphoneService(IBookingRepository bookingRepository) {
+    public CellphoneService(IBookingRepository bookingRepository, PhoneApiClient phoneApiClient) {
         this.bookingRepository = bookingRepository;
+        this.phoneApiClient = phoneApiClient;
         fillQtyMap();
     }
 
@@ -41,7 +46,21 @@ public class CellphoneService {
             LocalDateTime latest = bookings.stream().map(BookingDto::getBookingDate).max(LocalDateTime::compareTo).get();
             phoneDto.setBookingTime(latest);
         }
+        fillTechnicalInfo(phoneDto);
+
         return phoneDto;
+    }
+
+    private void fillTechnicalInfo(PhoneDto phoneDto) {
+        log.info("Filling tecnical info for phone: {}", phoneDto.getName());
+        var responseDto = phoneApiClient.getPhoneInfo(phoneDto.getName());
+        if (responseDto.getHttpStatusCode() == HttpStatus.OK.value()) {
+            phoneDto.setTechnicalInfoDto(responseDto.getTechnicalInfoDto());
+        } else {
+            log.error("Error getting technical info for phone: {}", phoneDto.getName());
+        }
+
+        phoneDto.setTechnicalInfoDto(responseDto.getTechnicalInfoDto());
     }
 
     private void fillQtyMap() {
