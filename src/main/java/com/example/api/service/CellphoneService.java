@@ -4,6 +4,7 @@ import com.example.api.client.PhoneApiClient;
 import com.example.api.dto.BookingDto;
 import com.example.api.dto.PhoneDto;
 import com.example.api.enums.CellphoneNameEnum;
+import com.example.api.exception.InvalidPhoneNameException;
 import com.example.api.repository.IBookingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,9 @@ public class CellphoneService {
     }
 
     public PhoneDto getPhone(String phoneName) {
+        if (!CellphoneNameEnum.validName(phoneName)) {
+            throw new InvalidPhoneNameException("Phone not booked");
+        }
         var phoneDto = new PhoneDto();
         phoneDto.setName(phoneName);
         List<BookingDto> bookings = bookingRepository.findBooking(phoneName);
@@ -51,7 +55,7 @@ public class CellphoneService {
         var available = freeQty >= 1;
         phoneDto.setAvailable(available);
         List<String> users = bookings.stream().map(BookingDto::getUser).toList();
-        if (users.size()>=1) {
+        if (!users.isEmpty()) {
             phoneDto.setBookingUsers(users);
             LocalDateTime latest = bookings.stream().map(BookingDto::getBookingDate).max(LocalDateTime::compareTo).get();
             phoneDto.setBookingTime(latest);

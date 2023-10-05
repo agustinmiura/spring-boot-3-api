@@ -31,4 +31,13 @@ public class InMemoryBookingRepositoryImpl implements IBookingRepository {
     public List<BookingDto> findBooking(String phoneName) {
         return bookingDtoList.stream().filter(dto -> dto.getPhone().equals(phoneName)).toList();
     }
+
+    @Override
+    public void deleteById(String id) {
+        log.info(" Delete by id : {} ", id);
+        var optionalBooking = bookingDtoList.stream().filter(dto -> dto.getId().equals(id)).findAny();
+        if (optionalBooking.isPresent()) {
+            bookingDtoList.remove(optionalBooking.get());
+        }
+    }
 }
