@@ -32,12 +32,22 @@ public class CellphoneService {
         fillQtyMap();
     }
 
+    public int getInitialQty(String phoneName) {
+        return initialQtyMap.get(phoneName);
+    }
+
+    public int getFreeQty(String phoneName) {
+        var initialQty = initialQtyMap.get(phoneName);
+        List<BookingDto> bookings = bookingRepository.findBooking(phoneName);
+        var freeQty = initialQty - bookings.size();
+        return freeQty;
+    }
+
     public PhoneDto getPhone(String phoneName) {
         var phoneDto = new PhoneDto();
         phoneDto.setName(phoneName);
         List<BookingDto> bookings = bookingRepository.findBooking(phoneName);
-        var initialQty = initialQtyMap.get(phoneName);
-        var freeQty = initialQty - bookings.size();
+        var freeQty = getFreeQty(phoneName);
         var available = freeQty >= 1;
         phoneDto.setAvailable(available);
         List<String> users = bookings.stream().map(BookingDto::getUser).toList();

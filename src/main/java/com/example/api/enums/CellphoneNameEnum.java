@@ -1,5 +1,7 @@
 package com.example.api.enums;
 
+import io.micrometer.common.util.StringUtils;
+
 import java.util.Arrays;
 
 public enum CellphoneNameEnum {
@@ -24,6 +26,9 @@ public enum CellphoneNameEnum {
     }
 
     public static boolean validName(String phoneName) {
+        if (StringUtils.isBlank(phoneName)) {
+            return false;
+        }
         var optionalName = Arrays.stream(CellphoneNameEnum.values()).filter(cellphoneNameEnum -> cellphoneNameEnum.fullName.equals(phoneName)).findAny();
         return optionalName.isPresent();
     }
